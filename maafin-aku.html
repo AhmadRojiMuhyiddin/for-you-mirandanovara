@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maafin Aku Ya 🥺</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800;900&display=swap');
+
+  :root {
+    --pink: #f8a4b8;
+    --pink-dark: #e8728f;
+    --pink-light: #fde8ed;
+    --blue-light: #d6eaf8;
+    --cream: #fef9f0;
+    --dark: #3d2b1f;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: #fde8ed;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .floating-hearts {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .fheart {
+    position: absolute;
+    animation: floatUp 6s linear infinite;
+    opacity: 0;
+  }
+
+  @keyframes floatUp {
+    0% { transform: translateY(100vh); opacity: 0; }
+    10% { opacity: 0.5; }
+    90% { opacity: 0.3; }
+    100% { transform: translateY(-100px); opacity: 0; }
+  }
+
+  .screen {
+    display: none;
+    width: 100%;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .screen.active { display: flex; }
+
+  /* COVER */
+  #cover-screen {
+    background: linear-gradient(160deg, #ffc2d1 0%, #ffb3c6 50%, #f9a8d4 100%);
+    flex-direction: column;
+  }
+
+  .cover-card {
+    background: #fde8ed;
+    border-radius: 24px;
+    padding: 40px 32px;
+    margin: 20px;
+    max-width: 340px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(220,80,120,0.2);
+    position: relative;
+  }
+
+  .cover-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 13px;
+    color: #3d2b1f;
+    line-height: 2;
+    margin-bottom: 12px;
+  }
+
+  .cover-sub {
+    font-size: 15px;
+    color: #a0516a;
+    margin-bottom: 24px;
+    font-weight: 800;
+  }
+
+  .emoji-big {
+    font-size: 48px;
+    margin-bottom: 20px;
+    display: block;
+    animation: bounce 1s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    position: relative;
+    height: 60px;
+  }
+
+  .btn-yes {
+    background: linear-gradient(135deg, #e8728f, #c0395a);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 14px 28px;
+    font-size: 16px;
+    font-weight: 800;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #9b2542;
+    position: absolute;
+    left: 0;
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+
+  .btn-yes:active { transform: translateY(4px); box-shadow: none; }
+
+  .btn-no {
+    background: #b0bec5;
+    color: white;
+    border: none;
+    border-radius: 14px;
+    padding: 14px 20px;
+    font-size: 16px;
+    font-weight: 800;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #78909c;
+    position: absolute;
+    right: 0;
+    transition: left 0.05s, top 0.05s;
+  }
+
+  /* SLIDE SCREEN */
+  #slide-screen {
+    background: #fde8ed;
+    flex-direction: column;
+    padding: 20px 0;
+  }
+
+  .slide-wrapper {
+    width: 88%;
+    max-width: 360px;
+    overflow: hidden;
+    border-radius: 20px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+  }
+
+  .slides-container {
+    display: flex;
+    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* Each slide is a full-image card */
+  .slide {
+    min-width: 100%;
+    position: relative;
+    height: 480px;
+    background: #aed6f1;
+    overflow: hidden;
+  }
+
+  /* Full cover image */
+  .slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    position: absolute;
+    top: 0; left: 0;
+  }
+
+  /* Placeholder when no image */
+  .slide-img-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #5a8fb0;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(180deg, #aed6f1 0%, #d6eaf8 100%);
+  }
+
+  .placeholder-icon { font-size: 52px; }
+
+  /* Top title overlay */
+  .slide-title-overlay {
+    position: absolute;
+    top: 14px;
+    left: 0; right: 0;
+    text-align: center;
+    z-index: 3;
+  }
+
+  .overlay-main {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    color: white;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+  }
+
+  .overlay-badge {
+    display: inline-block;
+    background: #a0522d;
+    border-radius: 20px;
+    padding: 5px 14px;
+    margin-top: 6px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    color: white;
+  }
+
+  /* Bottom text overlay with gradient */
+  .slide-text-overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.3) 60%, transparent 100%);
+    padding: 32px 20px 20px;
+    z-index: 3;
+    text-align: center;
+  }
+
+  .pixel-hearts {
+    font-size: 22px;
+    letter-spacing: 4px;
+    margin-bottom: 8px;
+  }
+
+  .slide-text {
+    font-size: 13px;
+    color: white;
+    font-weight: 800;
+    text-align: center;
+    line-height: 1.9;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+  }
+
+  /* NAV */
+  .slide-nav {
+    background: white;
+    border-radius: 50px;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16px;
+    width: 92%;
+    max-width: 380px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  }
+
+  .nav-prev {
+    background: none; border: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px; font-weight: 800;
+    color: #aaa; cursor: pointer;
+    padding: 8px 14px;
+  }
+
+  .nav-next {
+    background: linear-gradient(135deg, #e8728f, #c0395a);
+    color: white; border: none;
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px; font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 3px 0 #9b2542;
+  }
+
+  .nav-next:active { transform: translateY(3px); box-shadow: none; }
+
+  .nav-count {
+    font-size: 15px; color: #888; font-weight: 700;
+  }
+
+  /* END SCREEN */
+  #end-screen {
+    background: linear-gradient(160deg, #ffc2d1, #f9a8d4);
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Pixel ground strip */
+  .pixel-ground {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 48px;
+    background: #5d8a3c;
+    image-rendering: pixelated;
+    z-index: 1;
+  }
+
+  .pixel-ground::before {
+    content: '';
+    position: absolute;
+    top: -8px; left: 0; right: 0;
+    height: 10px;
+    background: repeating-linear-gradient(90deg, #6fa84a 0px, #6fa84a 8px, #5d8a3c 8px, #5d8a3c 16px);
+  }
+
+  /* Pixel flowers container */
+  .pixel-flowers {
+    position: absolute;
+    bottom: 40px;
+    left: 0; right: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    padding: 0 12px;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  /* Single pixel flower SVG wrapper */
+  .pf {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: sway 3s ease-in-out infinite;
+    transform-origin: bottom center;
+  }
+
+  .pf:nth-child(2) { animation-delay: 0.4s; }
+  .pf:nth-child(3) { animation-delay: 0.8s; }
+  .pf:nth-child(4) { animation-delay: 1.2s; }
+  .pf:nth-child(5) { animation-delay: 0.6s; }
+  .pf:nth-child(6) { animation-delay: 1s; }
+
+  @keyframes sway {
+    0%, 100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+  }
+
+  .end-card {
+    background: rgba(253, 232, 237, 0.95);
+    border-radius: 24px;
+    padding: 32px 28px;
+    max-width: 320px;
+    width: 88%;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(220,80,120,0.2);
+    position: relative;
+    z-index: 3;
+    margin-bottom: 110px;
+  }
+
+  .end-pixel-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    color: #e8728f;
+    line-height: 2.2;
+    margin-bottom: 16px;
+  }
+
+  .end-main-text {
+    font-size: 15px; font-weight: 800;
+    color: #3d2b1f; line-height: 1.9;
+    margin-bottom: 20px;
+  }
+
+  .end-emoji {
+    font-size: 44px; display: block;
+    margin-bottom: 14px;
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+
+  .btn-restart {
+    background: linear-gradient(135deg, #e8728f, #c0395a);
+    color: white; border: none;
+    border-radius: 14px; padding: 12px 24px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 800;
+    cursor: pointer; box-shadow: 0 4px 0 #9b2542;
+  }
+
+  .btn-restart:active { transform: translateY(4px); box-shadow: none; }
+
+  .music-bar {
+    position: fixed; bottom: 16px; right: 16px;
+    background: rgba(255,255,255,0.92);
+    border-radius: 30px; padding: 8px 16px;
+    font-size: 12px; font-weight: 800;
+    color: #e8728f;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    display: none; align-items: center; gap: 6px;
+    z-index: 100;
+  }
+
+  .music-bar.show { display: flex; }
+</style>
+</head>
+<body>
+
+<div class="floating-hearts" id="floatingHearts"></div>
+
+<!-- COVER -->
+<div class="screen active" id="cover-screen">
+  <div class="cover-card">
+    <span class="emoji-big">🥺</span>
+    <div class="cover-title">Maafin<br>Aku Ya?</div>
+    <div class="cover-sub">Pweeaaasseee My Pacar... 🙏</div>
+    <div class="btn-row" id="btnRow">
+      <button class="btn-yes" onclick="startSlides()">Iya 🥹</button>
+      <button class="btn-no" id="btnNo" onclick="runAway()">Gak mau!</button>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDES -->
+<div class="screen" id="slide-screen">
+  <div class="slide-wrapper" id="slideWrapper">
+    <div class="slides-container" id="slidesContainer">
+
+      <!-- SLIDE 1 — Ganti foto1.jpg dengan nama file foto kamu -->
+      <div class="slide">
+         <img src="foto1.jpg" alt="">
+        <div class="slide-img-placeholder">
+          <span class="placeholder-icon">🌸</span>
+          <span>Ganti dengan<br>gambar kamu</span>
+        </div>
+        <div class="slide-title-overlay">
+          <div class="overlay-main">MY DEAREST</div>
+          <div class="overlay-badge">MY PACAR</div>
+        </div>
+        <div class="slide-text-overlay">
+         
+          <div class="slide-text">
+  
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 2 -->
+      <div class="slide">
+         <img src="foto2.jpg" alt="">
+        <div class="slide-img-placeholder">
+          <span class="placeholder-icon">💌</span>
+          <span>Ganti dengan<br>gambar kamu</span>
+        </div>
+        <div class="slide-text-overlay">
+          <div class="pixel-hearts">💗💗💗</div>
+          <div class="slide-text">
+           Aku tau kata maaf aja nggak cukup.<br>
+           Tapi aku nggak mau kehilangan kamu<br>
+           cuma gara-gara kesalahan aku. 🥺
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 3 -->
+      <div class="slide">
+         <img src="foto3.jpg" alt="">
+        <div class="slide-img-placeholder">
+          <span class="placeholder-icon">🌷</span>
+          <span>Ganti dengan<br>gambar kamu</span>
+        </div>
+        <div class="slide-text-overlay">
+          <div class="pixel-hearts">💕💕💕</div>
+          <div class="slide-text">
+            Kamu terlalu berharga buat aku,<br>
+            Aku gamau kalo sampai kehilangan kamu.<br>
+            Maafin aku ya sayang... 🥺
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 4 -->
+      <div class="slide">
+         <img src="foto4.jpg" alt="">
+        <div class="slide-img-placeholder">
+          <span class="placeholder-icon">💝</span>
+          <span>Ganti dengan<br>gambar kamu</span>
+        </div>
+        <div class="slide-text-overlay">
+          <div class="pixel-hearts">❤️💗💖</div>
+          <div class="slide-text">
+            Aku janji bakal lebih baik lagi.<br>
+            Karena kamu layak dapet<br>
+            yang terbaik dari aku. 💕
+          </div>
+        </div>
+      </div>
+
+
+
+    </div>
+  </div>
+
+  <div class="slide-nav">
+    <button class="nav-prev" id="btnPrev" onclick="changeSlide(-1)">Previous</button>
+    <span class="nav-count" id="slideCount">1 / 4</span>
+    <button class="nav-next" id="btnNext" onclick="changeSlide(1)">Next</button>
+  </div>
+</div>
+
+<!-- END -->
+<div class="screen" id="end-screen">
+  <div class="end-card">
+    <span class="end-emoji">🥺💕</span>
+    <div class="end-pixel-title">Thank You<br>For Forgiving<br>Me...</div>
+    <div class="end-main-text">
+      Makasih udah mau baca sampai akhir.<br>
+      I love You Miranda Novara! 💗
+    </div>
+    <button class="btn-restart" onclick="restart()">Ulangi dari awal 🔁</button>
+  </div>
+
+  <!-- Pixel flowers -->
+  <div class="pixel-flowers">
+
+    <!-- Flower 1 - pink tulip -->
+    <div class="pf">
+      <svg width="24" height="52" viewBox="0 0 24 52" style="image-rendering:pixelated" xmlns="http://www.w3.org/2000/svg">
+        <!-- petals -->
+        <rect x="8" y="0" width="8" height="4" fill="#ff6eb4"/>
+        <rect x="4" y="4" width="16" height="4" fill="#ff6eb4"/>
+        <rect x="4" y="8" width="16" height="4" fill="#ff9ed2"/>
+        <rect x="8" y="12" width="8" height="4" fill="#ff6eb4"/>
+        <!-- stem -->
+        <rect x="10" y="16" width="4" height="20" fill="#4a7c2f"/>
+        <!-- leaf -->
+        <rect x="6" y="24" width="4" height="4" fill="#5d9e3a"/>
+        <rect x="14" y="28" width="4" height="4" fill="#5d9e3a"/>
+        <!-- base -->
+        <rect x="8" y="36" width="8" height="4" fill="#4a7c2f"/>
+      </svg>
+    </div>
+
+    <!-- Flower 2 - small pink -->
+    <div class="pf" style="transform:scale(0.8)">
+      <svg width="20" height="44" viewBox="0 0 20 44" style="image-rendering:pixelated" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="0" width="8" height="4" fill="#ffb3d9"/>
+        <rect x="4" y="4" width="12" height="4" fill="#ff79b0"/>
+        <rect x="4" y="8" width="12" height="4" fill="#ffb3d9"/>
+        <rect x="6" y="12" width="8" height="4" fill="#ff79b0"/>
+        <rect x="8" y="16" width="4" height="16" fill="#4a7c2f"/>
+        <rect x="4" y="22" width="4" height="4" fill="#5d9e3a"/>
+        <rect x="8" y="32" width="4" height="4" fill="#4a7c2f"/>
+      </svg>
+    </div>
+
+    <!-- Flower 3 - white/cream -->
+    <div class="pf">
+      <svg width="28" height="56" viewBox="0 0 28 56" style="image-rendering:pixelated" xmlns="http://www.w3.org/2000/svg">
+        <!-- center -->
+        <rect x="10" y="4" width="8" height="8" fill="#ffe066"/>
+        <!-- petals around -->
+        <rect x="10" y="0" width="8" height="4" fill="#fff0f5"/>
+        <rect x="10" y="12" width="8" height="4" fill="#fff0f5"/>
+        <rect x="4" y="4" width="6" height="8" fill="#fff0f5"/>
+        <rect x="18" y="4" width="6" height="8" fill="#fff0f5"/>
+        <!-- stem -->
+        <rect x="12" y="16" width="4" height="24" fill="#4a7c2f"/>
+        <!-- leaves -->
+        <rect x="6" y="24" width="6" height="4" fill="#5d9e3a"/>
+        <rect x="16" y="30" width="6" height="4" fill="#5d9e3a"/>
+        <rect x="12" y="40" width="4" height="4" fill="#4a7c2f"/>
+      </svg>
+    </div>
+
+    <!-- Flower 4 - pink tulip small -->
+    <div class="pf" style="transform:scale(0.75)">
+      <svg width="24" height="52" viewBox="0 0 24 52" style="image-rendering:pixelated" xmlns="http://www.w3.org/2000/svg">
+        <rect x="8" y="0" width="8" height="4" fill="#e8728f"/>
+        <rect x="4" y="4" width="16" height="4" fill="#e8728f"/>
+        <rect x="4" y="8" width="16" height="4" fill="#ffaac8"/>
+        <rect x="8" y="12" width="8" height="4" fill="#e8728f"/>
+        <rect x="10" y="16" width="4" height="20" fill="#4a7c2f"/>
+        <rect x="6" y="22" width="4" height="4" fill="#5d9e3a"/>
+        <rect x="14" y="28" width="4" height="4" fill="#5d9e3a"/>
+        <rect x="8" y="36" width="8" height="4" fill="#4a7c2f"/>
+      </svg>
+    </div>
+
+    <!-- Flower 5 - daisy -->
+    <div class="pf">
+      <svg width="24" height="50" viewBox="0 0 24 50" style="image-rendering:pixelated" xmlns="http://www.w3.org/2000/svg">
+        <rect x="8" y="4" width="8" height="4" fill="#fff0f5"/>
+        <rect x="4" y="8" width="16" height="8" fill="#fff0f5"/>
+        <rect x="8" y="4" width="8" height="12" fill="#fff0f5"/>
+        <rect x="8" y="6" width="8" height="8" fill="#ffe066"/>
+        <rect x="10" y="16" width="4" height="20" fill="#4a7c2f"/>
+        <rect x="5" y="22" width="5" height="4" fill="#5d9e3a"/>
+        <rect x="14" y="27" width="5" height="4" fill="#5d9e3a"/>
+        <rect x="10" y="36" width="4" height="4" fill="#4a7c2f"/>
+      </svg>
+    </div>
+
+    <!-- Flower 6 - tiny pink -->
+    <div class="pf" style="transform:scale(0.7)">
+      <svg width="20" height="44" viewBox="0 0 20 44" style="image-rendering:pixelated" xmlns="http://www.w3.org/2000/svg">
+        <rect x="6" y="0" width="8" height="4" fill="#ffb3d9"/>
+        <rect x="4" y="4" width="12" height="8" fill="#ff79b0"/>
+        <rect x="6" y="12" width="8" height="4" fill="#ffb3d9"/>
+        <rect x="8" y="16" width="4" height="16" fill="#4a7c2f"/>
+        <rect x="4" y="22" width="4" height="4" fill="#5d9e3a"/>
+        <rect x="8" y="32" width="4" height="4" fill="#4a7c2f"/>
+      </svg>
+    </div>
+
+  </div>
+
+  <!-- Pixel ground -->
+  <div class="pixel-ground"></div>
+</div>
+
+<div class="music-bar" id="musicBar">
+  🎵 <span>Playing...</span>
+</div>
+
+<!-- File lagu.mp3 taruh di folder yang sama dengan file HTML ini -->
+<audio id="bgMusic" loop>
+  <source src="lagu.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+
+  const totalSlides = 4;
+  let currentSlide = 0;
+  let startX = 0;
+
+  // Floating hearts
+  const emojis = ['❤️','💗','💕','💖','💓','🌸','✨'];
+  const fc = document.getElementById('floatingHearts');
+  for (let i = 0; i < 14; i++) {
+    const h = document.createElement('div');
+    h.className = 'fheart';
+    h.textContent = emojis[i % emojis.length];
+    h.style.left = (Math.random() * 100) + '%';
+    h.style.animationDelay = (Math.random() * 6) + 's';
+    h.style.animationDuration = (4 + Math.random() * 4) + 's';
+    h.style.fontSize = (12 + Math.random() * 14) + 'px';
+    fc.appendChild(h);
+  }
+
+  // NO button — runs away inside the card
+  let noCount = 0;
+  const btnNo = document.getElementById('btnNo');
+  const btnRow = document.getElementById('btnRow');
+
+  function runAway() {
+    noCount++;
+    const rowW = btnRow.offsetWidth;
+    const btnW = btnNo.offsetWidth;
+    const maxX = rowW - btnW;
+    const randomX = Math.floor(Math.random() * maxX);
+    btnNo.style.right = 'auto';
+    btnNo.style.left = randomX + 'px';
+    // Shrink after 4 tries
+    if (noCount >= 4) {
+      const s = Math.max(0.45, 1 - (noCount - 3) * 0.12);
+      btnNo.style.transform = `scale(${s})`;
+    }
+    if (noCount >= 9) {
+      btnNo.style.opacity = '0';
+      btnNo.style.pointerEvents = 'none';
+    }
+  }
+
+  // YES — go to slides
+  function startSlides() {
+    document.getElementById('cover-screen').classList.remove('active');
+    document.getElementById('slide-screen').classList.add('active');
+    playMusic();
+    updateNav();
+  }
+
+  function playMusic() {
+    const audio = document.getElementById('bgMusic');
+    audio.volume = 0.7;
+    audio.play().then(() => {
+      document.getElementById('musicBar').classList.add('show');
+    }).catch(() => {
+      // autoplay blocked, try on next user interaction
+      document.addEventListener('click', () => audio.play(), { once: true });
+    });
+  }
+
+  function changeSlide(dir) {
+    const next = currentSlide + dir;
+    if (next < 0) return;
+    if (next >= totalSlides) { showEnding(); return; }
+    currentSlide = next;
+    document.getElementById('slidesContainer').style.transform = `translateX(-${currentSlide * 100}%)`;
+    updateNav();
+  }
+
+  function updateNav() {
+    document.getElementById('slideCount').textContent = `${currentSlide + 1} / ${totalSlides}`;
+    document.getElementById('btnPrev').style.color = currentSlide === 0 ? '#ccc' : '#aaa';
+    document.getElementById('btnNext').textContent = currentSlide === totalSlides - 1 ? 'Selesai 💕' : 'Next';
+  }
+
+  function showEnding() {
+    document.getElementById('slide-screen').classList.remove('active');
+    document.getElementById('end-screen').classList.add('active');
+  }
+
+  function restart() {
+    currentSlide = 0; noCount = 0;
+    btnNo.style.cssText = 'position:absolute; right:0;';
+    document.getElementById('slidesContainer').style.transform = 'translateX(0)';
+    document.getElementById('end-screen').classList.remove('active');
+    document.getElementById('cover-screen').classList.add('active');
+    updateNav();
+  }
+
+  // Swipe support
+  const sw = document.getElementById('slideWrapper');
+  sw.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+  sw.addEventListener('touchend', e => {
+    const diff = startX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) changeSlide(diff > 0 ? 1 : -1);
+  });
+  sw.addEventListener('mousedown', e => { startX = e.clientX; });
+  sw.addEventListener('mouseup', e => {
+    const diff = startX - e.clientX;
+    if (Math.abs(diff) > 50) changeSlide(diff > 0 ? 1 : -1);
+  });
+</script>
+</body>
+</html>
